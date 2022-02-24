@@ -20,8 +20,14 @@ class _SplashPageViewState extends State<SplashPageView> {
 
   @override
   void initState() {
-    super.initState();
     _controller = PageController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 
   Expanded createPageView() {
@@ -58,7 +64,12 @@ class _SplashPageViewState extends State<SplashPageView> {
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
-                children: [indicatorWidget()],
+                children: [
+                  indicatorWidget(),
+                  buildTitle(index, context),
+                  buildDecription(index, context),
+                  buildbuttons(index, context, _controller),
+                ],
               ),
             ),
           ),
@@ -71,13 +82,13 @@ class _SplashPageViewState extends State<SplashPageView> {
     return Expanded(
       flex: 1,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
                 SplashPageModel.pages.length,
                 (index) => Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
                       child: CircleAvatar(
                         radius: currentIndex == index ? 8 : 6,
                         backgroundColor: currentIndex == index
@@ -88,4 +99,68 @@ class _SplashPageViewState extends State<SplashPageView> {
       ),
     );
   }
+}
+
+Expanded buildTitle(int index, context) {
+  return Expanded(
+    flex: 1,
+    child: Container(
+      padding: const EdgeInsets.all(20),
+      child: Text(SplashPageModel.pages[index].title,
+          style: Theme.of(context)
+              .textTheme
+              .headline5
+              ?.copyWith(fontWeight: FontWeight.bold)),
+    ),
+  );
+}
+
+Expanded buildDecription(int index, context) {
+  return Expanded(
+      child: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 30),
+    child: Text(
+      SplashPageModel.pages[index].decription,
+      style: Theme.of(context)
+          .textTheme
+          .headline6
+          ?.copyWith(fontWeight: FontWeight.normal),
+    ),
+  ));
+}
+
+Expanded buildbuttons(index, context, _controller) {
+  return Expanded(
+      flex: 1,
+      child: Container(
+        child: Center(
+          child: Row(children: [
+            Expanded(
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                                body: Center(
+                                    child: Text(
+                              "Login SCREEN",
+                              style: Theme.of(context).textTheme.headline6,
+                            )))));
+                  },
+                  child: const Text("SKİP")),
+            ),
+            Expanded(
+              child: index == 2
+                  ? const SizedBox()
+                  : TextButton(
+                      onPressed: () {
+                        _controller.animateToPage(index == 2 ? 0 : index + 1,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease);
+                      },
+                      child: const Text("NEXT"),
+                    ),
+            )
+          ]),
+        ),
+      ));
 }
